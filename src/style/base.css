@@ -1,0 +1,121 @@
+.async-select-container {
+  margin-bottom: 1rem;
+  width: 100%;
+  position: relative;
+}
+
+.async-select-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+  font-size: 0.875rem;
+}
+
+.async-select-error {
+  color: #ff4d4f;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  position: absolute;
+  bottom: -1.25rem;
+  left: 0;
+}
+
+.async-select-loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+}
+
+.async-select-error-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  cursor: pointer;
+}
+
+.async-select__control {
+  min-height: 44px;
+  border-radius: 8px;
+  border: 1px solid #d9d9d9;
+  transition: all 0.3s;
+  box-shadow: none;
+}
+
+.async-select__control--is-focused {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.async-select__control--is-disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.async-select__menu {
+  border-radius: 8px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 
+              0 6px 16px 0 rgba(0, 0, 0, 0.08),
+              0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+}
+
+.async-select__option {
+  padding: 10px 12px;
+  font-size: 0.9rem;
+}
+
+.async-select__option--is-focused {
+  background-color: #e6f7ff;
+}
+
+.async-select__option--is-selected {
+  background-color: #1890ff;
+  color: white;
+}
+
+.async-select__indicator-separator {
+  background-color: #d9d9d9;
+}
+
+.async-select__loading-indicator {
+  color: #1890ff;
+}
+
+/* Dark theme */
+.theme-dark .async-select-label {
+  color: #f0f0f0;
+}
+
+.theme-dark .async-select__control {
+  background-color: #2d2d2d;
+  border-color: #555;
+}
+
+.theme-dark .async-select__single-value {
+  color: #f0f0f0;
+}
+
+.theme-dark .async-select__input {
+  color: #f0f0f0;
+}
+
+.theme-dark .async-select__menu {
+  background-color: #2d2d2d;
+}
+
+.theme-dark .async-select__option {
+  background-color: #2d2d2d;
+  color: #f0f0f0;
+}
+
+.theme-dark .async-select__option--is-focused {
+  background-color: #3a3a3a;
+}
+
+.theme-dark .async-select__option--is-selected {
+  background-color: #1890ff;
+  color: white;
+}
