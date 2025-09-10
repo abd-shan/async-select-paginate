@@ -1,7 +1,7 @@
 import React from 'react';
 import { Meta, StoryFn } from '@storybook/react';
 import AsyncSelectPaginate from '../components/AsyncSelectPaginate';
-import { AsyncSelectPaginateProps } from '../types/index';
+import { AsyncSelectPaginateProps } from '../types';
 
 export default {
   title: 'Components/AsyncSelectPaginate',

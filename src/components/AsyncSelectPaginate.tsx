@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { AsyncPaginate } from 'react-select-async-paginate';
 import { GroupBase, StylesConfig, ThemeConfig, LoadingIndicatorProps } from 'react-select';
 import { useDebounce } from '../hooks/useDebounce';
+import { useAsyncPaginateLoader } from '../hooks/useAsyncPaginateLoader';
 import ErrorIcon from './ErrorIcon';
 import LoadingSpinner from './LoadingSpinner';
 import './../style/base.css';
@@ -15,7 +16,7 @@ export interface AsyncSelectPaginateProps<T> {
     totalCount?: number;
   }>;
   getOptionLabel: (item: T) => string;
-  getOptionValue?: (item: T) => string | number;
+  getOptionValue?: (item: T) => string;
   renderOption?: (item: T) => React.ReactNode;
   label?: string;
   placeholder?: string;
@@ -40,82 +41,40 @@ export interface AsyncSelectPaginateProps<T> {
 }
 
 const AsyncSelectPaginate = <T extends unknown>({
-  value,
-  onChange,
-  loadOptions,
-  getOptionLabel,
-  getOptionValue = (item) => (item as any).id,
-  renderOption,
-  label = 'Select',
-  placeholder = 'Search...',
-  className = '',
-  classNamePrefix = 'async-select',
-  styles = {},
-  theme = 'light',
-  isDisabled = false,
-  isLoading = false,
-  loadingMessage = 'Loading...',
-  noOptionsMessage = ({ inputValue }) => inputValue ? 'No options found' : 'Start typing to search',
-  error = null,
-  debounceTimeout = 500,
-  minSearchLength = 0,
-  components = {},
-  closeMenuOnSelect = true,
-  isClearable = true,
-  isSearchable = true,
-  menuPlacement = 'auto',
-  pageSize = 10,
-  cacheUniq,
-}: AsyncSelectPaginateProps<T>) => {
+                                                  value,
+                                                  onChange,
+                                                  loadOptions,
+                                                  getOptionLabel,
+                                                  getOptionValue = (item) => String((item as any).id), // ✅ تحويل id ل string
+                                                  renderOption,
+                                                  label = 'Select',
+                                                  placeholder = 'Search...',
+                                                  className = '',
+                                                  classNamePrefix = 'async-select',
+                                                  styles = {},
+                                                  theme = 'light',
+                                                  isDisabled = false,
+                                                  isLoading = false,
+                                                  loadingMessage = 'Loading...',
+                                                  noOptionsMessage = ({ inputValue }) => inputValue ? 'No options found' : 'Start typing to search',
+                                                  error = null,
+                                                  debounceTimeout = 500,
+                                                  minSearchLength = 0,
+                                                  components = {},
+                                                  closeMenuOnSelect = true,
+                                                  isClearable = true,
+                                                  isSearchable = true,
+                                                  menuPlacement = 'auto',
+                                                  pageSize = 10,
+                                                  cacheUniq,
+                                                }: AsyncSelectPaginateProps<T>) => {
   const [inputValue, setInputValue] = useState('');
-  const [isLoadingInternal, setIsLoadingInternal] = useState(false);
-  const [errorState, setErrorState] = useState<string | null>(null);
   const debouncedSearch = useDebounce(inputValue, debounceTimeout);
-  
-  const currentError = error || errorState;
-  
-  // Reset error when input changes
-  useEffect(() => {
-    setErrorState(null);
-  }, [inputValue]);
 
-  const loadPaginatedOptions:any = useCallback(
-    async (search: string, page: number) => {
-      if (minSearchLength > 0 && search.length < minSearchLength) {
-        return {
-          options: [],
-          hasMore: false,
-        };
-      }
-      
-      setIsLoadingInternal(true);
-      setErrorState(null);
-      
-      try {
-        const response = await loadOptions(search, page);
-        setIsLoadingInternal(false);
-        return {
-          options: response.data,
-          hasMore: response.hasMore,
-          additional: {
-            page: page + 1,
-          },
-        };
-      } catch (err) {
-        setIsLoadingInternal(false);
-        setErrorState('Failed to load data. Please try again.');
-        console.error('AsyncSelectPaginate error:', err);
-        return {
-          options: [],
-          hasMore: false,
-          additional: {
-            page: page + 1,
-          },
-        };
-      }
-    },
-    [loadOptions, minSearchLength, setErrorState]
-  );
+  const { isLoading: isLoadingInternal, error: errorState, loadPaginatedOptions } =
+      useAsyncPaginateLoader(loadOptions, minSearchLength);
+
+  const currentError = error || errorState;
 
   const handleInputChange = (newValue: string) => {
     setInputValue(newValue);
@@ -125,17 +84,11 @@ const AsyncSelectPaginate = <T extends unknown>({
     onChange(selected);
   };
 
-  const formatOptionLabel = (item: T) => {
-    if (renderOption) {
-      return renderOption(item);
-    }
-    return <div>{getOptionLabel(item)}</div>;
-  };
+  const formatOptionLabel = (item: T) =>
+      renderOption ? renderOption(item) : <div>{getOptionLabel(item)}</div>;
 
   const customComponents = {
-    LoadingIndicator: (props: LoadingIndicatorProps) => (
-      <LoadingSpinner {...props} />
-    ),
+    LoadingIndicator: (props: LoadingIndicatorProps) => <LoadingSpinner {...props} />,
     ...components,
   };
 
@@ -144,45 +97,43 @@ const AsyncSelectPaginate = <T extends unknown>({
   }
 
   return (
-    <div className={`async-select-container ${className} theme-${theme}`}>
-      {label && <label className="async-select-label">{label}</label>}
-      
-      <AsyncPaginate
-        value={value}
-        onChange={handleChange}
-        inputValue={inputValue}
-        onInputChange={handleInputChange}
-        loadOptions={loadPaginatedOptions}
-        debounceTimeout={0} 
-        additional={{ page: 1 }}
-        placeholder={placeholder}
-        getOptionLabel={getOptionLabel}
-        getOptionValue={getOptionValue}
-        formatOptionLabel={formatOptionLabel}
-        classNamePrefix={classNamePrefix}
-        styles={styles}
-        isLoading={isLoading || isLoadingInternal}
-        loadingMessage={() => 
-          typeof loadingMessage === 'string' ? loadingMessage : loadingMessage()
-        }
-        noOptionsMessage={({ inputValue }) => 
-          typeof noOptionsMessage === 'string' 
-            ? noOptionsMessage 
-            : noOptionsMessage({ inputValue })
-        }
-        isDisabled={isDisabled || isLoading}
-        components={customComponents}
-        closeMenuOnSelect={closeMenuOnSelect}
-        isClearable={isClearable}
-        isSearchable={isSearchable}
-        menuPlacement={menuPlacement}
-        cacheUniqs={cacheUniq ? [cacheUniq] : undefined}
-      />
-      
-      {currentError && (
-        <div className="async-select-error">{currentError}</div>
-      )}
-    </div>
+      <div className={`async-select-container ${className} theme-${theme}`}>
+        {label && <label className="async-select-label">{label}</label>}
+
+        <AsyncPaginate
+            value={value}
+            onChange={handleChange}
+            inputValue={inputValue}
+            onInputChange={handleInputChange}
+            loadOptions={loadPaginatedOptions}
+            debounceTimeout={0}
+            additional={{ page: 1 }}
+            placeholder={placeholder}
+            getOptionLabel={getOptionLabel}
+            getOptionValue={getOptionValue}
+            formatOptionLabel={formatOptionLabel}
+            classNamePrefix={classNamePrefix}
+            styles={styles}
+            isLoading={isLoading || isLoadingInternal}
+            loadingMessage={() =>
+                typeof loadingMessage === 'string' ? loadingMessage : loadingMessage()
+            }
+            noOptionsMessage={({ inputValue }) =>
+                typeof noOptionsMessage === 'string'
+                    ? noOptionsMessage
+                    : noOptionsMessage({ inputValue })
+            }
+            isDisabled={isDisabled || isLoading}
+            components={customComponents}
+            closeMenuOnSelect={closeMenuOnSelect}
+            isClearable={isClearable}
+            isSearchable={isSearchable}
+            menuPlacement={menuPlacement}
+            cacheUniqs={cacheUniq ? [cacheUniq] : undefined}
+        />
+
+        {currentError && <div className="async-select-error">{currentError}</div>}
+      </div>
   );
 };
 
