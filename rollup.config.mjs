@@ -9,13 +9,15 @@ export default [
   {
     input: 'src/index.tsx',
     output: [
-      { file: 'dist/cjs/index.js', format: 'cjs' },
-      { file: 'dist/esm/index.js', format: 'esm' }
+      { file: 'dist/cjs/index.js', format: 'cjs', sourcemap: true },
+      { file: 'dist/esm/index.js', format: 'esm', sourcemap: true }
     ],
     plugins: [
       resolve(),
       commonjs(),
-      typescript({ tsconfig: './tsconfig.json' }),
+      typescript({ 
+        tsconfig: './tsconfig.json'
+      }),
       postcss({
         extract: true,
         modules: false,
@@ -25,7 +27,7 @@ export default [
     external: ['react', 'react-dom', 'react-select-async-paginate']
   },
   {
-    input: 'src/index.tsx',
+    input: 'src/types-only.ts',
     output: [{ file: 'dist/index.d.ts', format: 'esm' }],
     plugins: [dts()],
   }

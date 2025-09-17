@@ -1,0 +1,20 @@
+# Global owners
+* @abd-shan
+
+# Documentation
+*.md @abd-shan
+
+# Configuration files
+package.json @abd-shan
+tsconfig.json @abd-shan
+rollup.config.mjs @abd-shan
+jest.config.cjs @abd-shan
+
+# Source code
+src/ @abd-shan
+
+# Tests
+src/test/ @abd-shan
+
+# Stories
+src/stories/ @abd-shan

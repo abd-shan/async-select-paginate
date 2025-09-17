@@ -1,0 +1,42 @@
+# Source files
+src/
+*.ts
+*.tsx
+*.js
+*.jsx
+
+# Development files
+.storybook/
+*.stories.tsx
+*.test.tsx
+*.test.js
+*.spec.tsx
+*.spec.js
+
+# Build tools
+rollup.config.js
+tsconfig.json
+jest.config.js
+babel.config.js
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Other
+coverage/
+.nyc_output/

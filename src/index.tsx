@@ -1,3 +1,2 @@
-import AsyncSelectPaginate from './components/AsyncSelectPaginate';
-export default AsyncSelectPaginate;
+export { default } from './components/AsyncSelectPaginate';
 export * from './types';
