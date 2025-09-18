@@ -71,7 +71,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-select-async-paginate": "^0.7.11",
-    "rollup": "^4.46.2",
+    "rollup": "^4.50.2",
     "rollup-plugin-dts": "^6.2.3",
     "rollup-plugin-postcss": "^4.0.2",
     "ts-jest": "^29.4.3",
