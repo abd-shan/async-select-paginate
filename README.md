@@ -306,4 +306,3 @@ PRs and issues welcome. Include reproductions and tests for new behavior.
 ## License
 Choose a license (e.g. MIT) and add a LICENSE file.
 
-...existing code...
