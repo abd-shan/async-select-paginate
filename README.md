@@ -1,105 +1,146 @@
-# Async Select Paginate
+# react-generic-select
 
-A powerful and customizable React component for async select with pagination, infinite scroll, and beautiful animations.
+A lightweight, TypeScript-first React select component with paginated async loading built on top of `react-select`. Focuses on simplicity, customization, and predictable async pagination behavior.
 
-## Features
+---
 
-- 🔄 **Async Loading**: Load options asynchronously with pagination
-- ♾️ **Infinite Scroll**: Automatically load more options as user scrolls
-- 🎨 **Customizable**: Highly customizable with themes and custom option rendering
-- 📱 **Responsive**: Works perfectly on all device sizes
-- 🎭 **Animations**: Smooth animations and transitions
-- 🔍 **Search**: Built-in search functionality
-- 📦 **TypeScript**: Full TypeScript support
-- 🧪 **Tested**: Comprehensive test coverage
+## Key features
+- Paginated async loading via a simple `loadOptions(search, page)` function.
+- Full TypeScript support and typed props.
+- Built-in debounce to reduce excessive requests.
+- Customizable option rendering (`renderOption`, `getOptionLabel`, `getOptionValue`).
+- Configurable min search length before triggering requests.
+- Handles loading and error states with optional overrides.
+- Small surface area — focused on the core use-case (search + pagination).
 
-## Installation
+---
 
-```bash
-npm install async-select-paginate
+## Quick install (local testing)
+To try the package locally from the project folder (Windows PowerShell):
+
+- Install directly from local folder:
+  npm i file:c:/Users/Abdulkader/Desktop/react-generic-select
+
+- Or create a tarball and install it:
+  cd c:\Users\Abdulkader\Desktop\react-generic-select
+  npm run build
+  npm pack
+  # Then in a consumer project:
+  npm i c:\Users\Abdulkader\Desktop\react-generic-select\react-generic-select-1.0.0.tgz
+
+- For active development linking:
+  cd c:\Users\Abdulkader\Desktop\react-generic-select
+  npm run build
+  npm link
+  # In consumer project:
+  npm link react-generic-select
+
+Tip: add a `prepare` script to `package.json` so installs from git build automatically:
+```json
+"scripts": {
+  "build": "tsc -p tsconfig.json",
+  "prepare": "npm run build"
+}
 ```
 
-## Usage
+---
+
+## Quick usage
 
 ```tsx
-import AsyncSelectPaginate from 'async-select-paginate';
-import 'async-select-paginate/dist/style.css';
+import React from 'react';
+import AsyncSelectPaginate from 'react-generic-select';
 
-const MyComponent = () => {
-  const loadOptions = async (searchQuery, loadedOptions, { page }) => {
-    const response = await fetch(`/api/options?search=${searchQuery}&page=${page}`);
-    const data = await response.json();
-    
-    return {
-      options: data.options,
-      hasMore: data.hasMore,
-      additional: {
-        page: page + 1,
-      },
-    };
-  };
+type Item = { id: number; name: string };
+
+const loadOptions = async (search: string, page: number) => {
+  // return: { data: T[], hasMore: boolean, totalCount?: number }
+  const res = await fetch(`/api/items?q=${encodeURIComponent(search)}&page=${page}`);
+  const json = await res.json();
+  return { data: json.items, hasMore: json.hasMore, totalCount: json.totalCount };
+};
+
+export default function Example() {
+  const [value, setValue] = React.useState<Item | null>(null);
 
   return (
-    <AsyncSelectPaginate
+    <AsyncSelectPaginate<Item>
+      value={value}
+      onChange={setValue}
       loadOptions={loadOptions}
-      onChange={(selectedOption) => console.log(selectedOption)}
-      placeholder="Select an option..."
+      getOptionLabel={(i) => i.name}
+      getOptionValue={(i) => String(i.id)}
+      placeholder="Search..."
     />
   );
-};
+}
 ```
 
-## Props
+---
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `loadOptions` | `(searchQuery, loadedOptions, additional) => Promise<{options, hasMore, additional}>` | - | Function to load options asynchronously |
-| `onChange` | `(selectedOption) => void` | - | Callback when selection changes |
-| `placeholder` | `string` | 'Select...' | Placeholder text |
-| `isSearchable` | `boolean` | `true` | Enable search functionality |
-| `isClearable` | `boolean` | `true` | Show clear button |
-| `isDisabled` | `boolean` | `false` | Disable the select |
-| `isLoading` | `boolean` | `false` | Show loading state |
-| `value` | `OptionType` | - | Selected value |
-| `defaultValue` | `OptionType` | - | Default selected value |
-| `className` | `string` | - | Additional CSS class |
-| `theme` | `'light' \| 'dark'` | `'light'` | Theme variant |
-| `customOptionRenderer` | `(option) => ReactNode` | - | Custom option renderer |
-| `customValueRenderer` | `(option) => ReactNode` | - | Custom value renderer |
+## Important props (summary)
+- value: T | null  
+- onChange: (item: T | null) => void  
+- loadOptions: (search: string, page: number) => Promise<{ data: T[]; hasMore: boolean; totalCount?: number }>  
+- getOptionLabel: (item: T) => string  
+- getOptionValue?: (item: T) => string | number (defaults to stringified `id`)  
+- renderOption?: (item: T) => React.ReactNode  
+- placeholder?: string  
+- label?: string  
+- debounceTimeout?: number (ms, default 500)  
+- minSearchLength?: number (default 0)  
+- pageSize?: number (informational / for server-side)  
+- isLoading?: boolean (can override internal loading)  
+- error?: string | null (override error message)  
+- noOptionsMessage?: string | ({ inputValue: string }) => string
 
-## Styling
+Refer to the component props types in `src/components/AsyncSelectPaginate.tsx` for the full list.
 
-The component comes with built-in styles that you can import:
+---
 
-```tsx
-import 'async-select-paginate/dist/style.css';
-```
+## Behavior & expectations
+- `loadOptions` must return an object containing `data` (array) and `hasMore` (boolean). Missing or malformed response will log a warning and show an error message.
+- If `minSearchLength` > 0, the component will not call `loadOptions` until the input reaches that length.
+- Debounce delays calls by `debounceTimeout` ms to avoid frequent requests while typing.
+- Pagination is controlled via an `additional.page` value internally; each successful load increments the page.
 
-You can also customize the appearance by overriding CSS variables or using custom classes.
+---
 
-## Development
+## Why choose this library?
+- TypeScript-first API for safer integration in typed projects.
+- Minimal and focused: implements only what is needed for searchable, paginated selects — easier to understand and customize.
+- Predictable async contract: single `loadOptions(search, page)` signature simplifies backend integration and testing.
+- Built-in debounce + min-search-length to reduce server load by default.
+- Easy to override rendering and behavior (option label/value/render, loading/error messages, components).
 
-```bash
-# Install dependencies
-npm install
+---
 
-# Run tests
-npm test
+## Testing & development
+- Build TypeScript artifacts:
+  npm run build
 
-# Run tests in watch mode
-npm run test:watch
+- Run tests (Jest + React Testing Library):
+  npm test
 
-# Build the library
-npm run build
+- Local publish simulation:
+  npm pack
+  npm i path/to/react-generic-select-<version>.tgz
 
-# Run Storybook
-npm run storybook
-```
+---
 
-## License
+## Publishing checklist
+- Set `name`, `version`, `main`, `module`, and `types` in `package.json`.
+- Add `files` and include the built `dist/` or compiled output.
+- Ensure `prepare` builds before clients install from git.
+- Login to npm and run:
+  npm publish
 
-MIT
+---
 
 ## Contributing
+PRs and issues welcome. Include reproductions and tests for new behavior.
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+---
+
+## License
+Choose a license (e.g. MIT) and add a LICENSE file.
