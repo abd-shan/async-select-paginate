@@ -1,5 +1,5 @@
 {
-  "name": "async-select-paginate",
+  "name": "react-generic-async-select",
   "version": "1.0.0",
   "type": "module",
   "description": "A generic async select component with infinite scroll, animations, and customizable option rendering.",
