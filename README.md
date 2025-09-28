@@ -17,42 +17,19 @@ A lightweight, TypeScript-first React select component with paginated async load
 
 ## Quick install (local testing)
 
-Note: package.json name is `react-generic-async-select` — import using that name unless you change the package name.
+Note: package.json name is `react-generic-async-select`
+## Installation
 
-Install directly from local folder (PowerShell):
+Install the library via npm:
 
-```powershell
-npm i file:c:/Users/Abdulkader/Desktop/react-generic-select
+```bash
+npm install react-generic-async-select
 ```
 
-Build + install tarball:
+You also need to install `react`, `react-dom`, and `react-select-async-paginate` as peer dependencies if they are not already installed:
 
-```powershell
-cd c:\Users\Abdulkader\Desktop\react-generic-select
-npm run build
-npm pack
-# in the consumer project:
-npm i c:\Users\Abdulkader\Desktop\react-generic-select\react-generic-async-select-1.0.0.tgz
-```
-
-Active development linking:
-
-```powershell
-cd c:\Users\Abdulkader\Desktop\react-generic-select
-npm run build
-npm link
-# in consumer project:
-npm link react-generic-async-select
-```
-
-Tip: add a `prepare` script in package.json so installs from git build automatically:
-
-```json
-"scripts": {
-  "build": "rollup -c rollup.config.mjs",
-  "prepare": "npm run build",
-  "prepublishOnly": "npm run build"
-}
+```bash
+npm install react react-dom react-select-async-paginate
 ```
 
 ---
@@ -61,7 +38,7 @@ Tip: add a `prepare` script in package.json so installs from git build automatic
 
 ```tsx
 import React from 'react';
-import AsyncSelectPaginate from 'react-generic-async-select'; // use package name from package.json
+import AsyncSelectPaginate from 'react-generic-async-select'; // use 
 
 type Item = { id: number; name: string };
 
