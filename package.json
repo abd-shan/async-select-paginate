@@ -1,6 +1,6 @@
 {
   "name": "react-generic-async-select",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "A generic async select component with infinite scroll, animations, and customizable option rendering.",
   "main": "dist/cjs/index.js",
