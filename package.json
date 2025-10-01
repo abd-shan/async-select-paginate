@@ -33,6 +33,19 @@
     "type": "git",
     "url": "git+https://github.com/abd-shan/async-select-paginate.git"
   },
+    "keywords": [
+    "react",
+    "crud",
+    "table",
+    "search",
+    "reusable-component",
+    "data-table",
+    "form",
+    "management",
+    "react-component",
+    "ui",
+    "interface"
+  ],
   "bugs": {
     "url": "https://github.com/abd-shan/async-select-paginate/issues"
   },
