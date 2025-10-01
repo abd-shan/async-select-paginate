@@ -31,6 +31,12 @@ You also need to install `react`, `react-dom`, and `react-select-async-paginate`
 ```bash
 npm install react react-dom react-select-async-paginate
 ```
+Or if you have ready dependencies
+
+```bash
+npm install react-select-async-paginate
+```
+
 
 ---
 
