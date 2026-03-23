@@ -1,4 +1,4 @@
-import { GroupBase, StylesConfig, ThemeConfig } from 'react-select';
+import { GroupBase, StylesConfig } from 'react-select';
 
 export interface LoadOptionsResponse<T> {
   data: T[];
@@ -38,4 +38,6 @@ export interface AsyncSelectPaginateProps<T> {
   menuPlacement?: 'auto' | 'bottom' | 'top';
   pageSize?: number;
   cacheUniq?: any;
+  enableCache?: boolean;
+  cacheTTL?: number;
 }

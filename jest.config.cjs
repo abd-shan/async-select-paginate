@@ -12,7 +12,7 @@ module.exports = {
   collectCoverageFrom: [
     'src/**/*.(ts|tsx)',
     '!src/**/*.stories.(ts|tsx)',
-    '!src/**/*.test.(ts|tsx)',غ
+    '!src/**/*.test.(ts|tsx)',
     '!src/**/*.spec.(ts|tsx)',
   ],
   coverageDirectory: 'coverage',

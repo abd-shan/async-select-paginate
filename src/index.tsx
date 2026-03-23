@@ -1,2 +1,2 @@
 export { default } from './components/AsyncSelectPaginate';
-export * from './types';
+export * from './types/index';

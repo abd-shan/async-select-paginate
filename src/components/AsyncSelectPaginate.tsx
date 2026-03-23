@@ -1,51 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { AsyncPaginate } from 'react-select-async-paginate';
-import { GroupBase, StylesConfig, ThemeConfig, LoadingIndicatorProps } from 'react-select';
-import { useDebounce } from '../hooks/useDebounce';
+import { LoadingIndicatorProps } from 'react-select';
 import { useAsyncPaginateLoader } from '../hooks/useAsyncPaginateLoader';
+import type { AsyncSelectPaginateProps } from '../types/index';
 import ErrorIcon from './ErrorIcon';
 import LoadingSpinner from './LoadingSpinner';
 import './../style/base.css';
-
-export interface AsyncSelectPaginateProps<T> {
-  value: T | null;
-  onChange: (item: T | null) => void;
-  loadOptions: (search: string, page: number) => Promise<{
-    data: T[];
-    hasMore: boolean;
-    totalCount?: number;
-  }>;
-  getOptionLabel: (item: T) => string;
-  getOptionValue?: (item: T) => string;
-  renderOption?: (item: T) => React.ReactNode;
-  label?: string;
-  placeholder?: string;
-  className?: string;
-  classNamePrefix?: string;
-  styles?: StylesConfig<T, false, GroupBase<T>>;
-  theme?: 'light' | 'dark';
-  isDisabled?: boolean;
-  isLoading?: boolean;
-  loadingMessage?: string | (() => string);
-  noOptionsMessage?: string | (({ inputValue }: { inputValue: string }) => string);
-  error?: string | null;
-  debounceTimeout?: number;
-  minSearchLength?: number;
-  components?: any;
-  closeMenuOnSelect?: boolean;
-  isClearable?: boolean;
-  isSearchable?: boolean;
-  menuPlacement?: 'auto' | 'bottom' | 'top';
-  pageSize?: number;
-  cacheUniq?: any;
-}
 
 const AsyncSelectPaginate = <T extends unknown>({
                                                   value,
                                                   onChange,
                                                   loadOptions,
                                                   getOptionLabel,
-                                                  getOptionValue = (item) => String((item as any).id), // ✅ تحويل id ل string
+                                                  getOptionValue = (item) => String((item as any).id),
                                                   renderOption,
                                                   label = 'Select',
                                                   placeholder = 'Search...',
@@ -65,20 +32,18 @@ const AsyncSelectPaginate = <T extends unknown>({
                                                   isClearable = true,
                                                   isSearchable = true,
                                                   menuPlacement = 'auto',
-                                                  pageSize = 10,
                                                   cacheUniq,
+                                                  enableCache = true,
+                                                  cacheTTL = 5 * 60 * 1000,
                                                 }: AsyncSelectPaginateProps<T>) => {
-  const [inputValue, setInputValue] = useState('');
-  const debouncedSearch = useDebounce(inputValue, debounceTimeout);
-
   const { isLoading: isLoadingInternal, error: errorState, loadPaginatedOptions } =
-      useAsyncPaginateLoader(loadOptions, minSearchLength);
+      useAsyncPaginateLoader(loadOptions, minSearchLength, {
+        cacheUniq,
+        enableCache,
+        cacheTTL,
+      });
 
   const currentError = error || errorState;
-
-  const handleInputChange = (newValue: string) => {
-    setInputValue(newValue);
-  };
 
   const handleChange = (selected: T | null) => {
     onChange(selected);
@@ -86,6 +51,7 @@ const AsyncSelectPaginate = <T extends unknown>({
 
   const formatOptionLabel = (item: T) =>
       renderOption ? renderOption(item) : <div>{getOptionLabel(item)}</div>;
+  const normalizedGetOptionValue = (item: T) => String(getOptionValue(item));
 
   const customComponents = {
     LoadingIndicator: (props: LoadingIndicatorProps) => <LoadingSpinner {...props} />,
@@ -103,14 +69,12 @@ const AsyncSelectPaginate = <T extends unknown>({
         <AsyncPaginate
             value={value}
             onChange={handleChange}
-            inputValue={inputValue}
-            onInputChange={handleInputChange}
             loadOptions={loadPaginatedOptions}
-            debounceTimeout={0}
+            debounceTimeout={debounceTimeout}
             additional={{ page: 1 }}
             placeholder={placeholder}
             getOptionLabel={getOptionLabel}
-            getOptionValue={getOptionValue}
+            getOptionValue={normalizedGetOptionValue}
             formatOptionLabel={formatOptionLabel}
             classNamePrefix={classNamePrefix}
             styles={styles}

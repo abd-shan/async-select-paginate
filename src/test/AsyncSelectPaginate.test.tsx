@@ -22,6 +22,7 @@ describe('AsyncSelectPaginate', () => {
         onChange={() => {}}
         loadOptions={mockLoadOptions}
         getOptionLabel={(item: any) => item.name}
+        debounceTimeout={0}
       />
     );
 
@@ -45,6 +46,7 @@ describe('AsyncSelectPaginate', () => {
         onChange={() => {}}
         loadOptions={mockLoadOptions}
         getOptionLabel={(item: any) => item.name}
+        debounceTimeout={0}
       />
     );
 
