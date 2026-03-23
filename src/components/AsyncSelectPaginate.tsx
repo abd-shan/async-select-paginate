@@ -1,42 +1,46 @@
-import React from 'react';
+import React, { useCallback, useImperativeHandle, useMemo, useState } from 'react';
 import { AsyncPaginate } from 'react-select-async-paginate';
 import { LoadingIndicatorProps } from 'react-select';
 import { useAsyncPaginateLoader } from '../hooks/useAsyncPaginateLoader';
-import type { AsyncSelectPaginateProps } from '../types/index';
+import type { AsyncSelectPaginateProps, AsyncSelectPaginateRef } from '../types/index';
 import ErrorIcon from './ErrorIcon';
 import LoadingSpinner from './LoadingSpinner';
 import './../style/base.css';
 
-const AsyncSelectPaginate = <T extends unknown>({
-                                                  value,
-                                                  onChange,
-                                                  loadOptions,
-                                                  getOptionLabel,
-                                                  getOptionValue = (item) => String((item as any).id),
-                                                  renderOption,
-                                                  label = 'Select',
-                                                  placeholder = 'Search...',
-                                                  className = '',
-                                                  classNamePrefix = 'async-select',
-                                                  styles = {},
-                                                  theme = 'light',
-                                                  isDisabled = false,
-                                                  isLoading = false,
-                                                  loadingMessage = 'Loading...',
-                                                  noOptionsMessage = ({ inputValue }) => inputValue ? 'No options found' : 'Start typing to search',
-                                                  error = null,
-                                                  debounceTimeout = 500,
-                                                  minSearchLength = 0,
-                                                  components = {},
-                                                  closeMenuOnSelect = true,
-                                                  isClearable = true,
-                                                  isSearchable = true,
-                                                  menuPlacement = 'auto',
-                                                  cacheUniq,
-                                                  enableCache = true,
-                                                  cacheTTL = 5 * 60 * 1000,
-                                                }: AsyncSelectPaginateProps<T>) => {
-  const { isLoading: isLoadingInternal, error: errorState, loadPaginatedOptions } =
+const AsyncSelectPaginateInner = <T extends unknown>(
+  {
+    value,
+    onChange,
+    loadOptions,
+    getOptionLabel,
+    getOptionValue = (item) => String((item as any).id),
+    renderOption,
+    label = 'Select',
+    placeholder = 'Search...',
+    className = '',
+    classNamePrefix = 'async-select',
+    styles = {},
+    theme = 'light',
+    isDisabled = false,
+    isLoading = false,
+    loadingMessage = 'Loading...',
+    noOptionsMessage = ({ inputValue }) => inputValue ? 'No options found' : 'Start typing to search',
+    error = null,
+    debounceTimeout = 500,
+    minSearchLength = 0,
+    components = {},
+    closeMenuOnSelect = true,
+    isClearable = true,
+    isSearchable = true,
+    menuPlacement = 'auto',
+    cacheUniq,
+    enableCache = true,
+    cacheTTL = 5 * 60 * 1000,
+  }: AsyncSelectPaginateProps<T>,
+  ref: React.Ref<AsyncSelectPaginateRef>
+) => {
+  const [manualResetVersion, setManualResetVersion] = useState(0);
+  const { isLoading: isLoadingInternal, error: errorState, loadPaginatedOptions, resetCache } =
       useAsyncPaginateLoader(loadOptions, minSearchLength, {
         cacheUniq,
         enableCache,
@@ -52,6 +56,23 @@ const AsyncSelectPaginate = <T extends unknown>({
   const formatOptionLabel = (item: T) =>
       renderOption ? renderOption(item) : <div>{getOptionLabel(item)}</div>;
   const normalizedGetOptionValue = (item: T) => String(getOptionValue(item));
+  const composedCacheUniqs = useMemo(
+    () => (cacheUniq !== undefined ? [manualResetVersion, cacheUniq] : [manualResetVersion]),
+    [cacheUniq, manualResetVersion]
+  );
+
+  const handleResetCache = useCallback(() => {
+    resetCache();
+    setManualResetVersion((prev) => prev + 1);
+  }, [resetCache]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      resetCache: handleResetCache,
+    }),
+    [handleResetCache]
+  );
 
   const customComponents = {
     LoadingIndicator: (props: LoadingIndicatorProps) => <LoadingSpinner {...props} />,
@@ -93,12 +114,18 @@ const AsyncSelectPaginate = <T extends unknown>({
             isClearable={isClearable}
             isSearchable={isSearchable}
             menuPlacement={menuPlacement}
-            cacheUniqs={cacheUniq ? [cacheUniq] : undefined}
+            cacheUniqs={composedCacheUniqs}
         />
 
         {currentError && <div className="async-select-error">{currentError}</div>}
       </div>
   );
 };
+
+const AsyncSelectPaginate = React.forwardRef(AsyncSelectPaginateInner) as <T>(
+  props: AsyncSelectPaginateProps<T> & React.RefAttributes<AsyncSelectPaginateRef>
+) => React.ReactElement;
+
+(AsyncSelectPaginate as unknown as { displayName?: string }).displayName = 'AsyncSelectPaginate';
 
 export default AsyncSelectPaginate;

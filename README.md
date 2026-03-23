@@ -95,8 +95,26 @@ export default function Example() {
 | isClearable, isSearchable, closeMenuOnSelect | boolean | `true` | Standard react-select behaviors. |
 | className, classNamePrefix, styles | any | `''`, `'async-select'`, `{}` | Styling hooks and class prefixes. |
 | cacheUniq | any | — | Used to invalidate internal cache when changed. |
+| enableCache | boolean | `true` | Enables internal query+page caching. |
+| cacheTTL | number (ms) | `300000` | Cache expiry window for each query+page entry. |
 
 Full props and types are exported from the package — see `src/types/index.ts` and the exported types from the package entry point.
+
+---
+
+## Ref API
+
+The component exposes an imperative ref API:
+
+```tsx
+import React from 'react';
+import AsyncSelectPaginate, { AsyncSelectPaginateRef } from 'react-generic-async-select';
+
+const ref = React.useRef<AsyncSelectPaginateRef>(null);
+ref.current?.resetCache();
+```
+
+- `resetCache()`: clears internal query+page cache and invalidates `react-select-async-paginate` cache.
 
 ---
 

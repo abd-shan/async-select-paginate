@@ -32,7 +32,7 @@ export function useAsyncPaginateLoader<T>(
     const cacheRef = useRef<Map<string, { timestamp: number; result: PaginatedResult<T> }>>(new Map());
     const inflightRef = useRef<Map<string, Promise<PaginatedResult<T>>>>(new Map());
 
-    useEffect(() => {
+    const resetCache = useCallback(() => {
         resetTokenRef.current += 1;
         cacheRef.current.clear();
         inflightRef.current.clear();
@@ -40,7 +40,11 @@ export function useAsyncPaginateLoader<T>(
         activeRequestsRef.current = 0;
         setIsLoading(false);
         setError(null);
-    }, [cacheUniq, minSearchLength, enableCache, cacheTTL]);
+    }, []);
+
+    useEffect(() => {
+        resetCache();
+    }, [cacheUniq, minSearchLength, enableCache, cacheTTL, resetCache]);
 
     const loadPaginatedOptions = useCallback(
         async (
@@ -135,5 +139,5 @@ export function useAsyncPaginateLoader<T>(
         [cacheTTL, enableCache, loadOptions, minSearchLength]
     );
 
-    return { isLoading, error, loadPaginatedOptions };
+    return { isLoading, error, loadPaginatedOptions, resetCache };
 }

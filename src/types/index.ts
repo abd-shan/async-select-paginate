@@ -41,3 +41,7 @@ export interface AsyncSelectPaginateProps<T> {
   enableCache?: boolean;
   cacheTTL?: number;
 }
+
+export interface AsyncSelectPaginateRef {
+  resetCache: () => void;
+}
