@@ -80,6 +80,6 @@
     "rollup-plugin-dts": "^6.2.3",
     "rollup-plugin-postcss": "^4.0.2",
     "ts-jest": "^29.4.4",
-    "typescript": "^5.9.2"
+    "typescript": "^6.0.2"
   }
 }
